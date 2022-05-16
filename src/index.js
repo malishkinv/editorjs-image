@@ -4,7 +4,7 @@ import toolboxIcon from '../assets/toolboxIcon.svg';
 
 /**
  * InlineImage Tool for the Editor.js
- * Works with pasted images, embedded URLs and Unsplash images.
+ * Works with pasted images, embedded URLs.
  * Requires no server-side uploader.
  *
  * @typedef {object} InlineImageData
@@ -14,9 +14,6 @@ import toolboxIcon from '../assets/toolboxIcon.svg';
  * @property {boolean} withBorder - should image be rendered with border
  * @property {boolean} withBackground - should image be rendered with background
  * @property {boolean} stretched - should image be stretched to full width of container
- * @property {object} unsplash - Unsplash image information
- *  - author: Unsplash image author name
- *  - profileLink: Author profile link
  */
 export default class InlineImage {
   /**
@@ -28,7 +25,7 @@ export default class InlineImage {
    */
   static get toolbox() {
     return {
-      title: 'InlineImage',
+      title: 'Image',
       icon: toolboxIcon,
     };
   }
@@ -62,8 +59,7 @@ export default class InlineImage {
       caption: data.caption || '',
       withBorder: data.withBorder !== undefined ? data.withBorder : false,
       withBackground: data.withBackground !== undefined ? data.withBackground : false,
-      stretched: data.stretched !== undefined ? data.stretched : false,
-      unsplash: data.unsplash,
+      stretched: data.stretched !== undefined ? data.stretched : false
     };
   }
 

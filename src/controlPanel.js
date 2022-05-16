@@ -1,10 +1,8 @@
-import { make, isUrl, createImageCredits } from './helpers';
-import UnsplashClient from './unsplashClient';
+import { make, isUrl } from './helpers';
 
 /**
  * Renders control panel view
  *  - Embed image url
- *  - Embed image from Unsplash
  */
 export default class ControlPanel {
   /**
@@ -43,15 +41,11 @@ export default class ControlPanel {
     this.nodes = {
       loader: null,
       embedUrlTab: null,
-      unsplashTab: null,
       embedUrlPanel: null,
-      unsplashPanel: null,
       imageGallery: null,
       searchInput: null,
     };
 
-    this.unsplashClient = new UnsplashClient(this.config.unsplash);
-    this.searchTimeout = null;
     this.showEmbedTab = this.config.embed ? this.config.embed.display : true
   }
 
@@ -67,24 +61,15 @@ export default class ControlPanel {
       innerHTML: 'Embed URL',
       onclick: () => this.showEmbedUrlPanel(),
     });
-    const unsplashTab = make('div', [this.cssClasses.tab, this.showEmbedTab ? null : this.cssClasses.active], {
-      innerHTML: 'Unsplash',
-      onclick: () => this.showUnsplashPanel(),
-    });
 
     const embedUrlPanel = this.renderEmbedUrlPanel();
-    const unsplashPanel = this.renderUnsplashPanel();
 
     this.showEmbedTab && tabWrapper.appendChild(embedUrlTab);
-    tabWrapper.appendChild(unsplashTab);
     wrapper.appendChild(tabWrapper);
     this.showEmbedTab && wrapper.appendChild(embedUrlPanel);
-    wrapper.appendChild(unsplashPanel);
 
     this.nodes.embedUrlPanel = this.showEmbedTab ? embedUrlPanel : null;
-    this.nodes.unsplashPanel = unsplashPanel;
     this.nodes.embedUrlTab   = this.showEmbedTab ? embedUrlTab : null;
-    this.nodes.unsplashTab   = unsplashTab;
 
     return wrapper;
   }
@@ -96,21 +81,7 @@ export default class ControlPanel {
    */
   showEmbedUrlPanel() {
     this.nodes.embedUrlTab.classList.add(this.cssClasses.active);
-    this.nodes.unsplashTab.classList.remove(this.cssClasses.active);
     this.nodes.embedUrlPanel.classList.remove(this.cssClasses.hidden);
-    this.nodes.unsplashPanel.classList.add(this.cssClasses.hidden);
-  }
-
-  /**
-   * Shows "Unsplash" control panel
-   *
-   * @returns {void}
-   */
-  showUnsplashPanel() {
-    this.nodes.unsplashTab.classList.add(this.cssClasses.active);
-    this.nodes.embedUrlTab.classList.remove(this.cssClasses.active);
-    this.nodes.unsplashPanel.classList.remove(this.cssClasses.hidden);
-    this.nodes.embedUrlPanel.classList.add(this.cssClasses.hidden);
   }
 
   /**
@@ -153,133 +124,5 @@ export default class ControlPanel {
         style: 'error',
       });
     }
-  }
-
-  /**
-   * Creates "Unsplash" control panel
-   *
-   * @returns {HTMLDivElement}
-   */
-  renderUnsplashPanel() {
-    const wrapper = make('div', this.showEmbedTab ? this.cssClasses.hidden : null);
-    const imageGallery = make('div', this.cssClasses.imageGallery);
-    const searchInput = make('div', [this.cssClasses.input, this.cssClasses.caption, this.cssClasses.search], {
-      id: 'unsplash-search',
-      contentEditable: !this.readOnly,
-      oninput: () => this.searchInputHandler(),
-    });
-
-    searchInput.dataset.placeholder = 'Search for an image...';
-
-    wrapper.appendChild(searchInput);
-    wrapper.appendChild(imageGallery);
-
-    this.nodes.searchInput = searchInput;
-    this.nodes.imageGallery = imageGallery;
-
-    return wrapper;
-  }
-
-  /**
-   * OnInput handler for Search input
-   *
-   * @returns {void}
-   */
-  searchInputHandler() {
-    this.showLoader();
-    this.performSearch();
-  }
-
-  /**
-   * Shows a loader spinner on image gallery
-   *
-   * @returns {void}
-   */
-  showLoader() {
-    this.nodes.imageGallery.innerHTML = '';
-    this.nodes.loader = make('div', this.cssClasses.loading);
-    this.nodes.imageGallery.appendChild(this.nodes.loader);
-  }
-
-  /**
-   * Performs image search on user input.
-   * Defines a timeout for preventing multiple requests
-   *
-   * @returns {void}
-   */
-  performSearch() {
-    clearTimeout(this.searchTimeout);
-    this.searchTimeout = setTimeout(() => {
-      const query = this.nodes.searchInput.innerHTML;
-      this.unsplashClient.searchImages(query,
-        (results) => this.appendImagesToGallery(results));
-    }, 1000);
-  }
-
-  /**
-   * Creates the image gallery using Unsplash API results.
-   *
-   * @param {Array} results Images from Unsplash API
-   */
-  appendImagesToGallery(results) {
-    this.nodes.imageGallery.innerHTML = '';
-    if (results && results.length) {
-      this.nodes.unsplashPanel.classList.add(this.cssClasses.scroll);
-      results.forEach((image) => {
-        this.createThumbImage(image);
-      });
-    } else {
-      const noResults = make('div', this.cssClasses.noResults, {
-        innerHTML: 'No images found',
-      });
-      this.nodes.imageGallery.appendChild(noResults);
-      this.nodes.unsplashPanel.classList.remove(this.cssClasses.scroll);
-    }
-  }
-
-  /**
-   * Creates a thumb image and appends it to the image gallery
-   *
-   * @param {Object} image Unsplash image object
-   * @returns {void}
-   */
-  createThumbImage(image) {
-    const imgWrapper = make('div', this.cssClasses.imgWrapper);
-    const img = make('img', this.cssClasses.thumb, {
-      src: image.thumb,
-      onclick: () => this.downloadUnsplashImage(image),
-    });
-
-    const { appName } = this.config.unsplash;
-    const imageCredits = createImageCredits({ ...image, appName });
-
-    imgWrapper.appendChild(img);
-    imgWrapper.appendChild(imageCredits);
-    this.nodes.imageGallery.append(imgWrapper);
-  }
-
-  /**
-   * Handler for embedding Unsplash images.
-   * Issues a request to Unsplash API
-   *
-   * @param {{url: string, author: string, profileLink: string, downloadLocation: string}}
-   *  url - Image url
-   *  author - Unsplash image author name
-   *  profileLink - Unsplash author profile link
-   *  downloadLocation - Unsplash endpoint for image download
-   *
-   * @returns {void}
-   */
-  downloadUnsplashImage({
-    url, author, profileLink, downloadLocation,
-  }) {
-    this.onSelectImage({
-      url,
-      unsplash: {
-        author,
-        profileLink,
-      },
-    });
-    this.unsplashClient.downloadImage(downloadLocation);
   }
 }
