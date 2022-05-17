@@ -1,6 +1,6 @@
 {
-  "name": "editorjs-inline-image",
-  "version": "1.1.0",
+  "name": "editorjs-image",
+  "version": "1.0",
   "keywords": [
     "tool",
     "image",
@@ -8,17 +8,17 @@
     "editor.js",
     "editorjs"
   ],
-  "description": "Unsplash inline images tool for editorjs",
+  "description": "Inline images tool for EditorJS",
   "license": "MIT",
-  "repository": "https://github.com/kommitters/editorjs-inline-image",
+  "repository": "https://github.com/malishkinv/editorjs-image",
   "main": "./dist/bundle.js",
   "scripts": {
     "build": "webpack --mode production",
     "build:dev": "webpack --mode development --watch"
   },
   "author": {
-    "name": "kommitters Open Source",
-    "email": "oss@kommit.co"
+    "name": "Malyshkin Vasiliy",
+    "email": "malishkinv@gmail.com"
   },
   "devDependencies": {
     "@babel/core": "^7.17.8",
