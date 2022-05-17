@@ -58,7 +58,7 @@ export default class ControlPanel {
     const wrapper = make('div', this.cssClasses.controlPanel);
     const tabWrapper = make('div', this.cssClasses.tabWrapper);
     const embedUrlTab = make('div', [this.cssClasses.tab, this.cssClasses.active], {
-      innerHTML: 'Embed URL',
+      innerHTML: 'Введите URL изображения',
       onclick: () => this.showEmbedUrlPanel(),
     });
 
@@ -97,11 +97,11 @@ export default class ControlPanel {
     });
     const embedImageButton = make('div', [this.cssClasses.embedButton, this.cssClasses.input], {
       id: 'embed-button',
-      innerHTML: 'Embed Image',
+      innerHTML: 'Вставить изображение',
       onclick: () => this.embedButtonClicked(urlInput.innerHTML),
     });
 
-    urlInput.dataset.placeholder = 'Enter image url...';
+    urlInput.dataset.placeholder = 'Введите url изображения...';
 
     wrapper.appendChild(urlInput);
     wrapper.appendChild(embedImageButton);
@@ -120,7 +120,7 @@ export default class ControlPanel {
       this.onSelectImage({ url: imageUrl });
     } else {
       this.api.notifier.show({
-        message: 'Please enter a valid url.',
+        message: 'Пожалуйста укажите правильный url.',
         style: 'error',
       });
     }

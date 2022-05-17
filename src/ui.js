@@ -98,7 +98,7 @@ export default class Ui {
     });
     this.nodes.imageHolder = make('div', this.CSS.imageHolder);
 
-    caption.dataset.placeholder = 'Enter a caption';
+    caption.dataset.placeholder = 'Введите название';
 
     if (data.url) {
       wrapper.appendChild(loader);
@@ -141,7 +141,7 @@ export default class Ui {
   onImageLoadError() {
     this.removeCurrentBlock();
     this.api.notifier.show({
-      message: 'Can not load the image, try again!',
+      message: 'Невозможно загрузить изображение, попробуйте еще раз!',
       style: 'error',
     });
   }
